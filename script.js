@@ -1,4 +1,4 @@
-// Function to get URL parameters
+// Lấy tham số từ URL
 function getUrlParams() {
     const params = new URLSearchParams(window.location.search);
     return {
@@ -22,18 +22,7 @@ function getUrlParams() {
     };
 }
 
-// Function to get current URL with parameters
-function getCurrentUrlWithParams() {
-    return window.location.href;
-}
-
-// Function to generate QR code URL using QuickChart API
-function generateQrCodeUrl(url) {
-    const encodedUrl = encodeURIComponent(url);
-    return `https://quickchart.io/qr?text=${encodedUrl}&size=100&margin=1`;
-}
-
-// Function to generate invoice URL from invoice object
+// Tạo URL từ dữ liệu invoice
 function generateInvoiceUrl(invoiceData) {
     const defaultData = {
         invoiceNumber: '#SALE00015',
@@ -67,89 +56,115 @@ function generateInvoiceUrl(invoiceData) {
     return `${baseUrl}?${params.toString()}`;
 }
 
-// Function to populate the invoice with data
+// Tạo URL QR code từ QuickChart API
+function generateQrCodeUrl(url) {
+    const encodedUrl = encodeURIComponent(url);
+    return `https://quickchart.io/qr?text=${encodedUrl}&size=150&margin=1`; // Tăng size lên 150 cho QR rõ hơn
+}
+
+// Điền dữ liệu vào hóa đơn
 function populateInvoice() {
     try {
         const params = getUrlParams();
-        const currentUrl = getCurrentUrlWithParams();
-        const qrCodeUrl = generateQrCodeUrl(currentUrl);
+        const invoiceUrl = generateInvoiceUrl(params); // Tạo URL từ dữ liệu hiện tại
+        const qrCodeUrl = generateQrCodeUrl(invoiceUrl); // Tạo QR code từ URL
 
+        // Điền thông tin hóa đơn
         document.getElementById('invoice-number').textContent =
             params.invoiceNumber;
         document.getElementById(
             'invoice-date'
         ).textContent = `Date of invoice: ${params.date}`;
-        document.getElementById('qr-code').src = qrCodeUrl;
-
         document.getElementById('customer-name').textContent =
             params.customerName;
         document.getElementById('invoice-from').textContent =
             params.invoiceFrom;
+        document.getElementById('total-amount').textContent = params.total;
 
+        // Điền bảng items
         const tableBody = document.getElementById('items-table-body');
-        tableBody.innerHTML = ''; // Clear existing rows
+        tableBody.innerHTML = '';
         params.items.forEach(item => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td data-label="Items">${item.name}</td>
-                <td data-label="Quantity">${item.quantity}</td>
-                <td data-label="Price">${item.price}</td>
-                <td data-label="Tax">${item.tax}</td>
-                <td data-label="Tax Amount">${item.taxAmount}</td>
-                <td data-label="Total">${item.total}</td>
+                <td>${item.name}</td>
+                <td>${item.quantity}</td>
+                <td>${item.price}</td>
+                <td>${item.tax}</td>
+                <td>${item.taxAmount}</td>
+                <td>${item.total}</td>
             `;
             tableBody.appendChild(row);
         });
 
-        document.getElementById('total-amount').textContent = params.total;
+        // Cập nhật QR code
+        const qrCodeImg = document.getElementById('qr-code');
+        qrCodeImg.src = qrCodeUrl;
+        qrCodeImg.onerror = () => {
+            console.error('Không tải được QR code:', qrCodeUrl);
+            qrCodeImg.src = 'https://via.placeholder.com/150?text=QR+Error';
+        };
+        qrCodeImg.onload = () => {
+            console.log('QR code tải thành công:', qrCodeUrl);
+        };
+
+        // Debug: In URL để kiểm tra
+        console.log('Invoice URL:', invoiceUrl);
+        console.log('QR Code URL:', qrCodeUrl);
     } catch (error) {
-        console.error('Error populating invoice:', error);
+        console.error('Lỗi khi tạo hóa đơn:', error);
         alert('Có lỗi xảy ra khi tạo hóa đơn');
     }
 }
 
-// Function to download the invoice as PDF
+// Tải hóa đơn dưới dạng PDF
 function downloadPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
     const invoiceElement = document.getElementById('invoice');
 
-    // Use html2canvas to capture the invoice as an image
-    html2canvas(invoiceElement, { scale: 2 })
-        .then(canvas => {
-            const imgData = canvas.toDataURL('image/png');
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({
-                orientation: 'portrait',
-                unit: 'mm',
-                format: 'a4'
-            });
-
-            const imgWidth = 190; // A4 width in mm (210mm - 10mm margin on each side)
-            const pageHeight = 295; // A4 height in mm
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-            let heightLeft = imgHeight;
-
-            let position = 10; // Start 10mm from the top
-
-            // Add the image to the PDF
-            doc.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-            heightLeft -= pageHeight;
-
-            // If the content is taller than one page, add more pages
-            while (heightLeft >= 0) {
-                position = heightLeft - imgHeight;
-                doc.addPage();
-                doc.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-                heightLeft -= pageHeight;
-            }
-
-            // Save the PDF
+    doc.html(invoiceElement, {
+        callback: function (doc) {
             doc.save(`invoice-${getUrlParams().invoiceNumber}.pdf`);
-        })
-        .catch(error => {
-            console.error('Error generating PDF:', error);
-            alert('Có lỗi xảy ra khi tạo PDF');
-        });
+        },
+        x: 10,
+        y: 10,
+        width: 190,
+        windowWidth: 800
+    });
 }
 
-// Call the function when the page loads
+// Test với dữ liệu tùy chỉnh
+function testInvoice() {
+    const testData = {
+        invoiceNumber: '#SALE00016',
+        date: '05-04-2025',
+        customerName: 'John Doe',
+        invoiceFrom: 'XYZ Corp',
+        items: [
+            {
+                name: 'Bút chì cao cấp',
+                quantity: 2,
+                price: '50,000đ',
+                tax: '10%',
+                taxAmount: '10,000đ',
+                total: '110,000đ'
+            }
+        ],
+        total: '110,000đ'
+    };
+
+    const testUrl = generateInvoiceUrl(testData);
+    const qrCodeUrl = generateQrCodeUrl(testUrl);
+    console.log('Test Invoice URL:', testUrl);
+    console.log('Test QR Code URL:', qrCodeUrl);
+
+    // Hiển thị QR code test (bỏ comment nếu muốn)
+    // document.getElementById('qr-code').src = qrCodeUrl;
+}
+
+// Gọi hàm khi trang tải
 window.onload = populateInvoice;
+
+// Gọi testInvoice() trong console nếu cần
+// testInvoice();
