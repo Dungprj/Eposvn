@@ -13,7 +13,7 @@ function getUrlParams() {
             const requiredFields = [
                 'invoiceNumber',
                 'date',
-                'customerName',
+                'invoiceTo',
                 'invoiceFrom',
                 'items',
                 'total'
@@ -73,7 +73,7 @@ function getUrlParams() {
             return {
                 invoiceNumber: parsedData.invoiceNumber,
                 date: parsedData.date,
-                customerName: parsedData.customerName,
+                invoiceTo: parsedData.invoiceTo,
                 invoiceFrom: parsedData.invoiceFrom,
                 items: parsedData.items,
                 total: parsedData.total
@@ -89,7 +89,7 @@ function getUrlParams() {
     return {
         invoiceNumber: '#',
         date: '',
-        customerName: 'Customer',
+        invoiceTo: 'Customer',
         invoiceFrom: '',
         items: [
             {
@@ -110,7 +110,7 @@ function generateInvoiceUrl(invoiceData) {
     const defaultData = {
         invoiceNumber: '#SALE00015',
         date: '04-04-2025',
-        customerName: 'Walk-In Customer',
+        invoiceTo: 'Walk-In Customer',
         invoiceFrom: 'Abc',
         items: [
             {
@@ -155,8 +155,7 @@ function populateInvoice() {
         document.getElementById(
             'invoice-date'
         ).textContent = `Date of invoice: ${params.date}`;
-        document.getElementById('customer-name').textContent =
-            params.customerName;
+        document.getElementById('customer-name').textContent = params.invoiceTo;
         document.getElementById('invoice-from').textContent =
             params.invoiceFrom;
         document.getElementById('total-amount').textContent = params.total;
@@ -215,7 +214,7 @@ function testInvoice() {
     const testData = {
         invoiceNumber: '#SALE00016',
         date: '05-04-2025',
-        customerName: 'Nguyễn Tiến Dũng',
+        invoiceTo: 'Nguyễn Tiến Dũng',
         invoiceFrom: 'Epos Group',
         items: [
             {
