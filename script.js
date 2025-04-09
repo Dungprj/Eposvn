@@ -87,21 +87,21 @@ function getUrlParams() {
 
     // Giá trị mặc định nếu không có tham số data
     return {
-        invoiceNumber: '#SALE00015',
-        date: '04-04-2025',
-        customerName: 'Walk-In Customer',
-        invoiceFrom: 'Abc',
+        invoiceNumber: '#',
+        date: '',
+        customerName: 'Customer',
+        invoiceFrom: '',
         items: [
             {
-                name: 'Dao bào hai lưỡi kiwi KW217 14,5cm',
-                quantity: 1,
-                price: '120,000đ',
-                tax: '0%',
-                taxAmount: '0đ',
-                total: '120,000đ'
+                name: '',
+                quantity: 0,
+                price: '',
+                tax: '',
+                taxAmount: '',
+                total: ''
             }
         ],
-        total: '120,000đ'
+        total: ''
     };
 }
 
