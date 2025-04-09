@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Include Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Include jsPDF library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Include html2canvas library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+
+<body>
+    <div class="invoice-wrapper">
+        <button onclick="downloadPDF()" class="pdf-btn no-print">
+            <i class="fas fa-download"></i>
+        </button>
+        <div class="invoice-container" id="invoice">
+            <div class="invoice-header">
+                <div class="invoice-info">
+                    <h2 id="invoice-number">#SALE00015</h2>
+                    <p id="invoice-date">Date of invoice: 04-04-2025</p>
+                    <div class="qr-code">
+                        <img id="qr-code" src="https://via.placeholder.com/100" alt="QR Code">
+                    </div>
+                </div>
+            </div>
+
+            <div class="invoice-details">
+                <div class="invoice-to">
+                    <h3>INVOICE TO:</h3>
+                    <p id="customer-name">Walk-In Customer</p>
+                </div>
+                <div class="invoice-from">
+                    <h3>INVOICE FROM:</h3>
+                    <p id="invoice-from">Abc</p>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table class="invoice-items">
+                    <thead>
+                        <tr>
+                            <th>ITEMS</th>
+                            <th>QUANTITY</th>
+                            <th>PRICE</th>
+                            <th>TAX</th>
+                            <th>TAX AMOUNT</th>
+                            <th>TOTAL</th>
+                        </tr>
+                    </thead>
+                    <tbody id="items-table-body">
+                        <!-- Items will be populated dynamically -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="invoice-total">
+                <h3>Total</h3>
+                <p id="total-amount">120,000đ</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
